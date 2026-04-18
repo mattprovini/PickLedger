@@ -10,7 +10,9 @@
 
 <div class="navbar">
 
-<div class="logo">PickLedger</div>
+<a href="/" class="logo-link">
+	<img src="/images/logo.png" alt="PickLedger Logo" class="logo-img">
+</a>
 
 <div class="nav-links">
 <a href="/">Home</a>
@@ -52,7 +54,11 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 	});
 
 	const result = await res.json();
-	alert(result.message);
+	if(result.message === "User created") {
+		window.location.href = "/login";
+	} else {
+		alert(result.message);
+	}
 });
 </script>
 

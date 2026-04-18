@@ -10,7 +10,9 @@
 
 <div class="navbar">
 
-<div class="logo">PickLedger</div>
+<a href="/" class="logo-link">
+	<img src="/images/logo.png" alt="PickLedger Logo" class="logo-img">
+</a>
 
 <div class="nav-links">
 <a href="/">Home</a>
@@ -45,11 +47,17 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 	const res = await fetch('http://192.168.56.104:3000/api/login', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
+		credentials: 'include',
 		body: JSON.stringify(data)
 	});
 
 	const result = await res.json();
-	alert(result.message);
+	if(result.message === "Login successful") {
+		window.location.href = "/";
+	}
+	else {
+		alert(result.message);
+	}
 });
 </script>
 </div>
