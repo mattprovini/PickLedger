@@ -1,0 +1,58 @@
+const express = require('express');
+const mongoose =require('mongoose');
+const bcrypt = require('bcrypt');
+const cors = require('cors');
+
+const user = require('./models/user');
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// connect to mongo
+mongoose.connect('mongodb://192.168.56.103/pickledger');
+
+mongoose.connection.once('open', () => {
+	console.log("Connected to MongoDB");
+});
+
+curl -X POST http://127.0.0.1:3000/api/register \ -H "Content-Type: application/json" \ -d '{"username":"testuser","email":"test@test.com","password":"123456"'
+// register
+app.post('/api/register', async (req, res) => {
+	const {username, email, password } = req.body;
+
+	const hashedPassword = await bcrypt.hash(password, 10)
+
+	const user = new user({
+		username,
+		email,
+		password: hashedPassword
+	});
+
+	await user.save();
+
+	res.json({ message: "User created" });
+});
+
+// login
+app.post('/api/login', async (req, res) => {
+	const { username, password } = req.body;
+
+	const user = await user.findOne({ username });
+
+	if (!user) return res.json({ message: "User not found" });
+
+	const valid = await bcrypt.compare(password, user.password);
+
+	if(!valid) return res.json({ message: "Invalid password" });
+
+	res.json({ message: "Login successful" });
+});
+
+
+
+
+app.listen(3000, () => {
+	console.log("Server running on port 3000");
+});
