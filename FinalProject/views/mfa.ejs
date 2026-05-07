@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MFA - PickLedger</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <a href="/" class="logo-link">
+    <img src="/images/logo.png" class="logo-img">
+  </a>
+
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+  </div>
+</div>
+
+<div class="container">
+  <h1>Email Verification</h1>
+  <p class="subtitle">Enter the 6-digit code sent to your email.</p>
+
+  <div class="card">
+    <input type="text" id="code" placeholder="Enter code">
+    <button onclick="verifyCode()">Verify</button>
+  </div>
+</div>
+
+<script>
+async function verifyCode() {
+  const code = document.getElementById('code').value;
+
+  const res = await fetch('http://192.168.56.104:3000/api/mfa/verify', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify({ code })
+  });
+
+  const result = await res.json();
+  alert(result.message);
+
+  if (result.message === "Login Successful") {
+    window.location.href = "/";
+  }
+}
+</script>
+
+</body>
+</html>

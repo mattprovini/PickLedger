@@ -2,67 +2,95 @@
 <html>
 
 <head>
-<title>Login - PickLedger</title>
-<link rel="stylesheet" href="/stylesheets/style.css">
+  <title>Login - PickLedger</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 
 <body>
 
 <div class="navbar">
 
-<a href="/" class="logo-link">
-	<img src="/images/logo.png" alt="PickLedger Logo" class="logo-img">
-</a>
+  <a href="/" class="logo-link">
+    <img src="/images/logo.png" alt="PickLedger Logo" class="logo-img">
+  </a>
 
-<div class="nav-links">
-<a href="/">Home</a>
-<a href="/login">Login</a>
-<a href="/register">Register</a>
-</div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+  </div>
 
 </div>
 
 <div class="container">
 
-<h1>Login</h1>
-<p class="subtitle">Access your PickLedger account.</p>
+  <h1>Login</h1>
+  <p class="subtitle">Access your PickLedger account.</p>
 
-<div class="card">
+  <div class="card">
 
-<form id="loginForm">
-<input type="text" id="username" placeholder="Username" required>
-<input type="password" id="password" placeholder="Password" required>
-<button type="submit">Login</button>
-</form>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+
+  </div>
+
+</div>
 
 <script>
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
-	e.preventDefault();
 
-	const data = {
-		username: document.getElementById('username').value,
-		password: document.getElementById('password').value
-	};
-	
-	const res = await fetch('http://192.168.56.104:3000/api/login', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		credentials: 'include',
-		body: JSON.stringify(data)
-	});
+  e.preventDefault();
 
-	const result = await res.json();
-	if(result.message === "Login successful") {
-		window.location.href = "/";
-	}
-	else {
-		alert(result.message);
-	}
+  const data = {
+    username: document.getElementById('username').value,
+    password: document.getElementById('password').value
+  };
+
+  try {
+
+    const res = await fetch('http://192.168.56.104:3000/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    console.log(result);
+
+    if (result.mfaRequired) {
+
+      alert(result.message);
+      window.location.href = "/mfa";
+
+    }
+    else if (result.message === "Login successful") {
+
+      window.location.href = "/";
+
+    }
+    else {
+
+      alert(result.message);
+
+    }
+
+  }
+  catch (error) {
+
+    console.error("Login error:", error);
+    alert("Login request failed");
+
+  }
+
 });
 </script>
-</div>
-
-</div>
 
 </body>
 </html>
