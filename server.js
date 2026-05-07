@@ -7,8 +7,19 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const logger = require('./logger');
+const nodemailer = require('nodemailer');
 
 const app = express();
+
+const transporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: 'provinimatthew@gmail.com',
+		pass: 'ppqreqjmfakyxgfk'
+	}
+});
+
+
 
 app.use(cors({
 	origin: 'http://192.168.56.102:3000',
@@ -98,11 +109,29 @@ app.post('/api/login', async (req, res) => {
 		return res.json({ message: "Invalid password" });		
 	}
 	// Store session
-	req.session.userId = user._id;
+	req.session.pendingMFAUser = user._id;
 
 	logger.info(`User login: ${username}`);
 	
-	res.json({ message: "Login successful" });
+	const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+	user.mfaCode = code;
+	user.mfaCodeExpires = new Date(Date.now() + 5 * 60 * 1000);
+	await user.save();
+
+	req.session.pendingMFAUser = user._id;
+
+	await transporter.sendMail({
+		from: 'provinimatthew@gmail.com',
+		to: user.email,
+		subject: 'PickLedger Login Code',
+		text: `Your pickledger login code is: ${code}`
+	});
+
+	res.json({
+		message: "MFA Code Sent to Email",
+		mfaRequired: true
+	});
 });
 
 // Logout feature
@@ -126,7 +155,35 @@ app.get('/api/test', (req, res) => {
 	res.json({ message: "Backend working " });
 });
 
+app.post('/api/mfa/verify', async (req, res) => {
+	const { code } = req.body;
+
+	const user = await User.findById(req.session.pendingMFAUser);
+
+	if(!user) {
+		return res.json({ message: "No MFA Session Found" });
+	}
+	
+	if(user.mfaCode !== code) {
+		return res.json({ message: "Invalid code" });
+	}
+
+	if(new Date() > user.mfaCodeExpires) {
+		return res.json({ message: "Code Expired" });
+	}
+
+	req.session.userId = user._id;
+	req.session.pendingMFAUser = null;
+
+	user.mfaCode = null;
+	user.mfaCodeExpires = null;
+	await user.save();
+
+	res.json({ message: "Login Successful" });
+});
 app.listen(3000, '0.0.0.0', () => {
 	logger.info('Server started on port 3000');
 	console.log("Server running on port 3000");
 });
+
+

@@ -24,3 +24,27 @@ info: Connected to MongoDB
 info: User login: blackcat
 info: New user registered: entourage
 info: User login: entourage
+info: Server started on port 3000
+info: Connected to MongoDB
+info: User login: blackcat
+info: Server started on port 3000
+info: Connected to MongoDB
+info: Server started on port 3000
+info: Connected to MongoDB
+info: New user registered: hello
+info: Server started on port 3000
+info: Connected to MongoDB
+info: User login: blackcat
+info: User login: hello
+info: User login: hello
+info: New user registered: jake
+info: User login: jake
+info: Server started on port 3000
+info: Connected to MongoDB
+info: Server started on port 3000
+info: Connected to MongoDB
+info: User login: blackcat
+info: User login: hello
+info: Server started on port 3000
+info: Connected to MongoDB
+info: User login: hello
