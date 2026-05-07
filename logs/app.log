@@ -1,0 +1,13 @@
+info: Server started on port 3000
+info: Connected to MongoDB
+info: New user registered: ${username}
+warn: User not found: ${username}
+info: Server started on port 3000
+info: Connected to MongoDB
+info: Server started on port 3000
+info: Connected to MongoDB
+info: New user registered: courtney
+warn: Invalid password attempt: courtney
+warn: Invalid password attempt: courtney
+info: New user registered: cat
+info: User login: cat

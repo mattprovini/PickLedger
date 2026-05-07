@@ -6,6 +6,7 @@ const User = require('./models/User');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const session = require('express-session');
+const logger = require('./logger');
 
 const app = express();
 
@@ -30,6 +31,7 @@ const loginLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 10,
 	message: { message: "Too many login attempts, try again later"}
+	//logger.warn('Too many login attemps issued to $(username)');
 });
 
 // Connect to mongo
@@ -37,6 +39,7 @@ mongoose.connect('mongodb://192.168.56.103:27017/pickledger');
 
 // Log connection
 mongoose.connection.once('open', () => {
+	logger.info('Connected to MongoDB');
 	console.log("Connected to MongoDB");
 });
 
@@ -71,6 +74,8 @@ app.post('/api/register', async (req, res) => {
 	});
 
 	await user.save();
+
+	logger.info(`New user registered: ${username}`);	
 	
 	res.json({ message: "User created" });
 });
@@ -81,21 +86,29 @@ app.post('/api/login', async (req, res) => {
 
 	const user = await User.findOne({ username });
 
-	if (!user) return res.json({ message: "User not found" });
+	if (!user) {
+		logger.warn(`User not found: ${username}`);
+		 return res.json({ message: "User not found" });
+	}
 
 	const valid = await bcrypt.compare(password, user.password);
 
-	if(!valid) return res.json({ message: "Invalid password" });
-
+	if(!valid) {
+		logger.warn(`Invalid password attempt: ${username}`);
+		return res.json({ message: "Invalid password" });		
+	}
 	// Store session
 	req.session.userId = user._id;
 
+	logger.info(`User login: ${username}`);
+	
 	res.json({ message: "Login successful" });
 });
 
 // Logout feature
 app.get('/api/logout', (req, res) => {
 	req.session.destroy(() => {
+		logger.info(`User logged out: ${username}`);
 		res.json({ message: "Logged out" });
 	});
 });
@@ -110,9 +123,11 @@ app.get('/api/check-auth', (req, res) => {
 
 // Log connections
 app.get('/api/test', (req, res) => {
+	logger.info('Backend working');
 	res.json({ message: "Backend working " });
 });
 
 app.listen(3000, '0.0.0.0', () => {
+	logger.info('Server started on port 3000');
 	console.log("Server running on port 3000");
 });
