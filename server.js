@@ -108,7 +108,6 @@ app.post('/api/login', async (req, res) => {
 // Logout feature
 app.get('/api/logout', (req, res) => {
 	req.session.destroy(() => {
-		logger.info(`User logged out: ${username}`);
 		res.json({ message: "Logged out" });
 	});
 });

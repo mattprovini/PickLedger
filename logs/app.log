@@ -11,3 +11,16 @@ warn: Invalid password attempt: courtney
 warn: Invalid password attempt: courtney
 info: New user registered: cat
 info: User login: cat
+info: Server started on port 3000
+info: Connected to MongoDB
+info: New user registered: blackcat
+info: User login: blackcat
+info: Server started on port 3000
+info: Connected to MongoDB
+warn: Invalid password attempt: blackcat
+info: User login: blackcat
+info: Server started on port 3000
+info: Connected to MongoDB
+info: User login: blackcat
+info: New user registered: entourage
+info: User login: entourage
